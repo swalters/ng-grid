@@ -1,5 +1,5 @@
 (function () {
-  angular.module('ui.i18n').service('ui-i18n-pt-br', ['ui-i18nService',
+  angular.module('ui.i18n').service('ui.i18n.pt.br', ['i18nService',
     function (i18nService) {
       i18nService.add('pt-br', {
         aggregate: {

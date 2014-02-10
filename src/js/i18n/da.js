@@ -1,5 +1,5 @@
 ﻿(function(){
-    angular.module('ui.i18n').service('ui-i18n-da', ['ui-i18nService',
+    angular.module('ui.i18n').service('ui.i18n.da', ['i18nService',
       function (i18nService) {
         i18nService.add('da',{
           aggregate:{

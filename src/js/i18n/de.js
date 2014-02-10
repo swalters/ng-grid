@@ -2,7 +2,7 @@
  * Created by Tim on 2/1/14.
  */
 (function () {
-  angular.module('ui.i18n').service('ui-i18n-de', ['ui-i18nService',
+  angular.module('ui.i18n').service('ui.i18n.de', ['i18nService',
     function (i18nService) {
       i18nService.add('de', {
         aggregate: {

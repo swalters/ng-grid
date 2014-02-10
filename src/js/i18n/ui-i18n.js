@@ -1,5 +1,5 @@
 /**
- * ui-i18n Created by Tim Sweet on 2/1/14.
+ * ui.i18n Created by Tim Sweet on 2/1/14.
  * https://github.com/timothyswt
  * MIT License
  */
@@ -9,7 +9,7 @@
 
   var module = angular.module('ui.i18n');
 
-  module.constant('ui-i18nConstants', {
+  module.constant('ui.i18nConstants', {
     MISSING: '[MISSING]: ',
     UPDATE_EVENT: '$uiI18n',
 
@@ -19,7 +19,7 @@
   });
 
 
-  module.service('ui-i18nService', ['$log', 'ui-i18nConstants', '$rootScope',
+  module.service('i18nService', ['$log', 'ui.i18nConstants', '$rootScope',
     function ($log, i18nConstants, $rootScope) {
 
       var langCache = {
@@ -71,6 +71,11 @@
           }
         },
 
+        get: function (lang) {
+          var language = lang ? lang : service.getCurrent();
+          return this._langs[language.toLowerCase()];
+        },
+
         set: function (lang) {
           if (lang) {
             langCache.setCurrent(lang);
@@ -111,7 +116,7 @@
     };
   };
 
-  module.directive('ui-i18n', ['ui-i18nService', 'ui-i18nConstants', localeDirective]);
+  module.directive('uiI18n', ['i18nService', 'ui.i18nConstants', localeDirective]);
 
   // directive syntax
   var uitDirective = function ($parse, i18nService, i18nConstants) {
@@ -143,6 +148,8 @@
               }
             });
             $scope.$on('$destroy', listener);
+
+            $elm.html(getter(i18nService.get()) || missing);
           }
         };
       }
@@ -159,11 +166,11 @@
   };
 
   DIRECTIVE_ALIASES.forEach(function (alias) {
-    module.directive(alias, ['$parse', 'ui-i18nService', 'ui-i18nConstants', uitDirective]);
+    module.directive(alias, ['$parse', 'i18nService', 'ui.i18nConstants', uitDirective]);
   });
 
   FILTER_ALIASES.forEach(function (alias) {
-    module.filter(alias, ['$parse', 'ui-i18nService', 'ui-i18nConstants', uitFilter]);
+    module.filter(alias, ['$parse', 'i18nService', 'ui.i18nConstants', uitFilter]);
   });
 
 })();
