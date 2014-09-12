@@ -4,32 +4,52 @@ describe('ui.grid.edit uiGridCellNavService', function () {
   var grid;
   var uiGridConstants;
   var uiGridCellNavConstants;
+  var RowCol;
+  var $timeout;
 
   beforeEach(module('ui.grid.cellNav'));
 
-  beforeEach(inject(function (_uiGridCellNavService_, _gridClassFactory_, $templateCache, _uiGridConstants_, _uiGridCellNavConstants_) {
+  beforeEach(inject(function (_uiGridCellNavService_, _gridClassFactory_, $templateCache,
+                              _uiGridConstants_, _uiGridCellNavConstants_, _RowCol_, _$timeout_) {
     uiGridCellNavService = _uiGridCellNavService_;
     gridClassFactory = _gridClassFactory_;
     uiGridConstants = _uiGridConstants_;
     uiGridCellNavConstants = _uiGridCellNavConstants_;
-
+    RowCol = _RowCol_;
+    $timeout = _$timeout_;
     $templateCache.put('ui-grid/uiGridCell', '<div/>');
 
-    grid = gridClassFactory.createGrid();
-    grid.options.columnDefs = [
+
+    var options = {columnDefs : [
       {name: 'col0', allowCellFocus: true},
       {name: 'col1', allowCellFocus: false},
-      {name: 'col2'}
-    ];
+      {name: 'col2'},
+      {name: 'Rcol0', allowCellFocus: true, renderContainer: 'right'}
+    ]};
 
-    grid.options.data = [
+    options.data = [
       {col0: 'row0col0', col1: 'row0col1', col2: 'row0col2'},
       {col0: 'row1col0', col1: 'row1col1', col2: 'row1col2'},
       {col0: 'row2col0', col1: 'row2col1', col2: 'row2col2'}
     ];
 
+
+    grid = gridClassFactory.createGrid(options);
+    grid.registerColumnBuilder(uiGridCellNavService.cellNavColumnBuilder);
+    grid.addRowHeaderColumn({name: 'Lcol0', allowCellFocus: true},0);
+
+
+
     uiGridCellNavService.initializeGrid(grid);
-    grid.modifyRows(grid.options.data);
+    $timeout(function () {
+      grid.createLeftContainer();
+      grid.createRightContainer();
+      grid.buildColumns().then(function () {
+        grid.modifyRows(grid.options.data);
+      });
+    });
+    $timeout.flush();
+
   }));
 
 
@@ -155,15 +175,25 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
   describe('navigate left', function () {
     beforeEach(function(){
-      grid.registerColumnBuilder(uiGridCellNavService.cellNavColumnBuilder);
-      grid.buildColumns();
+
+
     });
-    it('should navigate to col left from unfocusable column', function () {
-      var col = grid.columns[1];
-      var row = grid.rows[0];
-      var rowCol = uiGridCellNavService.getNextRowCol(uiGridCellNavConstants.direction.LEFT, grid, row, col);
+    iit('should navigate to col left from unfocusable column', function () {
+      var col = grid.renderContainers.body.visibleColumnCache[1];
+      var row = grid.renderContainers.body.visibleRowCache[0];
+      var curRowCol = new RowCol(row,col, grid.renderContainers.body, grid.renderContainers.body);
+      var rowCol = uiGridCellNavService.getNextRowCol(uiGridCellNavConstants.direction.LEFT, grid, curRowCol);
       expect(rowCol.row).toBe(grid.rows[0]);
-      expect(rowCol.col.colDef.name).toBe(grid.columns[0].colDef.name);
+      expect(rowCol.col.colDef.name).toBe('col0');
+    });
+
+    it('should navigate to left container same row', function () {
+      var col = grid.renderContainers.body.visibleColumnCache[0];
+      var row = grid.renderContainers.body.visibleRowCache[1];
+      var curRowCol = new RowCol(row,col, grid.renderContainers.body, grid.renderContainers.body);
+      var rowCol = uiGridCellNavService.getNextRowCol(uiGridCellNavConstants.direction.LEFT, grid, curRowCol);
+      expect(rowCol.row).toBe(row);
+      expect(rowCol.col.colDef.name).toBe('Lcol0');
     });
 
     it('should navigate up one row and far right column', function () {

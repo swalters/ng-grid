@@ -2,10 +2,20 @@
   'use strict';
   var module = angular.module('ui.grid.cellNav', ['ui.grid']);
 
-  function RowCol(row, col) {
-    this.row = row;
-    this.col = col;
-  }
+  module.factory('RowCol', ['gridUtil', function(gridUtil) {
+
+    function RowCol(row, col, rowContainer, colContainer) {
+      this.row = row;
+      this.col = col;
+      this.rowContainer = rowContainer;
+      this.colContainer = colContainer;
+    }
+
+    return RowCol;
+
+  }]);
+
+
 
   /**
    *  @ngdoc object
@@ -26,8 +36,8 @@
    *  @description Services for cell navigation features. If you don't like the key maps we use,
    *  or the direction cells navigation, override with a service decorator (see angular docs)
    */
-  module.service('uiGridCellNavService', ['$log', 'uiGridConstants', 'uiGridCellNavConstants', '$q',
-    function ($log, uiGridConstants, uiGridCellNavConstants, $q) {
+  module.service('uiGridCellNavService', ['$log', 'uiGridConstants', 'uiGridCellNavConstants', '$q', 'RowCol',
+    function ($log, uiGridConstants, uiGridCellNavConstants, $q, RowCol) {
 
       var service = {
 
@@ -140,33 +150,41 @@
          * @param {GridCol} curCol Gridcol
          * @returns {uiGridCellNavConstants.direction} rowCol object
          */
-        getNextRowCol: function (direction, grid, curRow, curCol) {
+        getNextRowCol: function (direction, grid, curRowCol) {
           switch (direction) {
             case uiGridCellNavConstants.direction.LEFT:
-              return service.getRowColLeft(grid.rows, grid.columns, curRow, curCol);
+              return service.getRowColLeft(grid, curRowCol.rowContainer.visibleRowCache, curRowCol.rowContainer.visibleColumnCache, curRowCol);
             case uiGridCellNavConstants.direction.RIGHT:
-              return service.getRowColRight(grid.rows, grid.columns, curRow, curCol);
+              return service.getRowColRight(grid.rows, grid.columns, curRowCol);
             case uiGridCellNavConstants.direction.UP:
-              return service.getRowColUp(grid.rows, grid.columns, curRow, curCol);
+              return service.getRowColUp(grid.rows, grid.columns, curRowCol);
             case uiGridCellNavConstants.direction.DOWN:
-              return service.getRowColDown(grid.rows, grid.columns, curRow, curCol);
+              return service.getRowColDown(grid.rows, grid.columns, curRowCol);
           }
         },
 
-        getRowColLeft: function (rows, cols, curRow, curCol) {
-          var colIndex = service.getNextColIndexLeft(cols, curCol);
+        getRowColLeft: function (grid, rows, cols, curRowCol) {
+          var colIndex = service.getNextColIndexLeft(cols, curRowCol.col);
+          var curColPos = cols.indexOf(curRowCol.col);
 
-          if (colIndex > curCol.index) {
-            if (curRow.index === 0) {
-              return new RowCol(curRow, cols[colIndex]); //return same row
+          if (colIndex > curColPos) {
+            if (curColPos === 0) {
+              return new RowCol(curRowCol.row, cols[colIndex]); //return same row
             }
             else {
-              //up one row and far right column
-              return new RowCol(rows[curRow.index - 1], cols[colIndex]);
+
+              if (grid.hasLeftContainer()) {
+                var cCols = grid.renderContainers.left.visibleColumnCache;
+                return new RowCol(curRowCol.row, cCols[cCols.length -1], curRowCol.rowContainer, grid.renderContainers.left);
+              }
+              else {
+                //up one row and far right column
+                return new RowCol(rows[curRowCol.row.index - 1], cols[colIndex]);
+              }
             }
           }
           else {
-            return new RowCol(curRow, cols[colIndex]);
+            return new RowCol(curRowCol.row, cols[colIndex]);
           }
         },
 
@@ -188,12 +206,15 @@
         },
 
         getNextColIndexLeft: function (cols, curCol) {
+
+          var curColPos = cols.indexOf(curCol);
+
           //start with next col to the left or the end of the array if curCol is the first col
-          var i = curCol.index === 0 ? cols.length - 1 : curCol.index - 1;
+          var i = curColPos === 0 ? cols.length - 1 : curColPos - 1;
 
           //find first focusable column to the left
           //circle around to the end of the array if no col is found
-          while (i !== curCol.index) {
+          while (i !== curColPos) {
             if (cols[i].colDef.allowCellFocus) {
               break;
             }
@@ -324,8 +345,8 @@
    </file>
    </example>
    */
-  module.directive('uiGridCellnav', ['$log', 'uiGridCellNavService', 'uiGridCellNavConstants',
-    function ($log, uiGridCellNavService, uiGridCellNavConstants) {
+  module.directive('uiGridCellnav', ['$log', 'uiGridCellNavService', 'uiGridCellNavConstants', 'RowCol',
+    function ($log, uiGridCellNavService, uiGridCellNavConstants, RowCol) {
       return {
         replace: true,
         priority: -150,
@@ -370,8 +391,8 @@
    *  @restrict A
    *  @description Stacks on top of ui.grid.uiGridCell to provide cell navigation
    */
-  module.directive('uiGridCell', ['uiGridCellNavService', '$log', 'uiGridCellNavConstants',
-    function (uiGridCellNavService, $log, uiGridCellNavConstants) {
+  module.directive('uiGridCell', ['uiGridCellNavService', '$log', 'uiGridCellNavConstants', 'RowCol',
+    function (uiGridCellNavService, $log, uiGridCellNavConstants, RowCol) {
       return {
         priority: -150, // run after default uiGridCell directive and ui.grid.edit uiGridCell
         restrict: 'A',
