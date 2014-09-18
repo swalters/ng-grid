@@ -178,7 +178,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
 
     });
-    iit('should navigate to col left from unfocusable column', function () {
+    it('should navigate to col left from unfocusable column', function () {
       var col = grid.renderContainers.body.visibleColumnCache[1];
       var row = grid.renderContainers.body.visibleRowCache[0];
       var curRowCol = new RowCol(row,col, grid.renderContainers.body, grid.renderContainers.body);
@@ -196,12 +196,13 @@ describe('ui.grid.edit uiGridCellNavService', function () {
       expect(rowCol.col.colDef.name).toBe('Lcol0');
     });
 
-    it('should navigate up one row and far right column', function () {
-      var col = grid.columns[0];
-      var row = grid.rows[1];
-      var rowCol = uiGridCellNavService.getNextRowCol(uiGridCellNavConstants.direction.LEFT, grid, row, col);
+    iit('should navigate up one row and far right column', function () {
+      var col = grid.renderContainers.left.visibleColumnCache[0];
+      var row = grid.renderContainers.body.visibleRowCache[1];
+      var curRowCol = new RowCol(row,col, grid.renderContainers.body, grid.renderContainers.left);
+      var rowCol = uiGridCellNavService.getNextRowCol(uiGridCellNavConstants.direction.LEFT, grid, curRowCol);
       expect(rowCol.row).toBe(grid.rows[0]);
-      expect(rowCol.col.colDef.name).toBe(grid.columns[2].colDef.name);
+      expect(rowCol.col.colDef.name).toBe('Rcol0');
     });
 
     it('should stay on same row and go to far right', function () {

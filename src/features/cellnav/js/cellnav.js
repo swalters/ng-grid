@@ -153,7 +153,7 @@
         getNextRowCol: function (direction, grid, curRowCol) {
           switch (direction) {
             case uiGridCellNavConstants.direction.LEFT:
-              return service.getRowColLeft(grid, curRowCol.rowContainer.visibleRowCache, curRowCol.rowContainer.visibleColumnCache, curRowCol);
+              return service.getRowColLeft(grid, curRowCol.rowContainer.visibleRowCache, curRowCol.colContainer.visibleColumnCache, curRowCol);
             case uiGridCellNavConstants.direction.RIGHT:
               return service.getRowColRight(grid.rows, grid.columns, curRowCol);
             case uiGridCellNavConstants.direction.UP:
@@ -169,7 +169,13 @@
 
           if (colIndex > curColPos) {
             if (curColPos === 0) {
-              return new RowCol(curRowCol.row, cols[colIndex]); //return same row
+              if (grid.hasLeftContainer()) {
+                var cCols = grid.renderContainers.left.visibleColumnCache;
+                return new RowCol(curRowCol.row, cCols[cCols.length -1], curRowCol.rowContainer, grid.renderContainers.left);
+              }
+              else {
+                return new RowCol(curRowCol.row, cols[colIndex]); //return same row
+               }
             }
             else {
 
