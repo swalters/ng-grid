@@ -955,14 +955,6 @@ angular.module('ui.grid')
     this.styleComputations.push(styleComputationInfo);
   };
 
-  Grid.prototype.getScrollbarWidthStyle = function () {
-    return {width: this.scrollbarWidth +  'px'};
-  };
-
-  Grid.prototype.getScrollbarHeightStyle = function () {
-    return {height: this.scrollbarHeight +  'px'};
-  };
-
 
   // NOTE (c0bra): We already have rowBuilders. I think these do exactly the same thing...
   // Grid.prototype.registerRowFilter = function(filter) {
@@ -1392,9 +1384,9 @@ angular.module('ui.grid')
 
     var viewPortWidth = this.gridWidth;
 
-    if (typeof(this.verticalScrollbarWidth) !== 'undefined' && this.verticalScrollbarWidth !== undefined && this.verticalScrollbarWidth > 0) {
-      viewPortWidth = viewPortWidth - this.verticalScrollbarWidth;
-    }
+    //if (typeof(this.verticalScrollbarWidth) !== 'undefined' && this.verticalScrollbarWidth !== undefined && this.verticalScrollbarWidth > 0) {
+    //  viewPortWidth = viewPortWidth - this.verticalScrollbarWidth;
+    //}
 
     var adjustment = self.getViewportAdjustment();
     
@@ -1408,9 +1400,9 @@ angular.module('ui.grid')
   Grid.prototype.getHeaderViewportWidth = function getHeaderViewportWidth() {
     var viewPortWidth = this.getViewportWidth();
 
-    if (typeof(this.verticalScrollbarWidth) !== 'undefined' && this.verticalScrollbarWidth !== undefined && this.verticalScrollbarWidth > 0) {
-      viewPortWidth = viewPortWidth + this.verticalScrollbarWidth;
-    }
+    //if (typeof(this.verticalScrollbarWidth) !== 'undefined' && this.verticalScrollbarWidth !== undefined && this.verticalScrollbarWidth > 0) {
+    //  viewPortWidth = viewPortWidth + this.verticalScrollbarWidth;
+    //}
 
     return viewPortWidth;
   };

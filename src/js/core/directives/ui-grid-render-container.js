@@ -309,6 +309,12 @@
               var viewportWidth = colContainer.getViewportWidth();
 
               var canvasHeight = rowContainer.getCanvasHeight();
+
+              //add additional height for scrollbar on left and right container
+              if ($scope.containerId !== 'body') {
+                canvasHeight += grid.scrollbarHeight;
+              }
+
               var viewportHeight = rowContainer.getViewportHeight();
 
               var headerViewportWidth = colContainer.getHeaderViewportWidth();
@@ -316,6 +322,7 @@
               
               // Set canvas dimensions
               ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas { width: ' + canvasWidth + 'px; height: ' + canvasHeight + 'px; }';
+
               ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-header-canvas { width: ' + (canvasWidth + grid.scrollbarWidth) + 'px; }';
               
               ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-viewport { width: ' + viewportWidth + 'px; height: ' + viewportHeight + 'px; }';

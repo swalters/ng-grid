@@ -49,25 +49,6 @@ angular.module('ui.grid')
       angular.extend(self, options);
     }
 
-    if (self.name === 'body') {
-      self.overflowX = 'scroll';
-      if (self.grid.hasRightContainerColumns()) {
-        self.overflowY = 'hidden';
-      }
-      else {
-        self.overflowY = 'scroll';
-      }
-    }
-    else if (self.name === 'left') {
-      self.overflowX = 'hidden';
-      self.overflowY = 'hidden';
-    }
-    else {
-      self.overflowX = 'hidden';
-      self.overflowY = 'scroll';
-    }
-
-
     grid.registerStyleComputation({
       priority: 5,
       func: function () {
@@ -192,10 +173,6 @@ angular.module('ui.grid')
 
     var viewPortHeight = self.grid.gridHeight - headerHeight - self.grid.footerHeight;
 
-    // Account for native horizontal scrollbar, if present
-    if (typeof(self.horizontalScrollbarHeight) !== 'undefined' && self.horizontalScrollbarHeight !== undefined && self.horizontalScrollbarHeight > 0) {
-      viewPortHeight = viewPortHeight - self.horizontalScrollbarHeight;
-    }
 
     var adjustment = self.getViewportAdjustment();
     
@@ -209,9 +186,9 @@ angular.module('ui.grid')
 
     var viewPortWidth = self.grid.gridWidth;
 
-    if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
-      viewPortWidth = viewPortWidth - self.grid.verticalScrollbarWidth;
-    }
+    //if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
+    //  viewPortWidth = viewPortWidth - self.grid.verticalScrollbarWidth;
+    //}
 
     var adjustment = self.getViewportAdjustment();
     
@@ -225,9 +202,9 @@ angular.module('ui.grid')
 
     var viewPortWidth = this.getViewportWidth();
 
-    if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
-      viewPortWidth = viewPortWidth + self.grid.verticalScrollbarWidth;
-    }
+    //if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
+    //  viewPortWidth = viewPortWidth + self.grid.verticalScrollbarWidth;
+    //}
 
     // var adjustment = self.getViewportAdjustment();
     // viewPortWidth = viewPortWidth + adjustment.width;
@@ -244,11 +221,8 @@ angular.module('ui.grid')
       ret += row.height;
     });
 
-    if (typeof(self.grid.horizontalScrollbarHeight) !== 'undefined' && self.grid.horizontalScrollbarHeight !== undefined && self.grid.horizontalScrollbarHeight > 0) {
-      ret = ret - self.grid.horizontalScrollbarHeight;
-    }
 
-    return ret + this.getScrollHeightOffset();
+    return ret;
   };
 
   GridRenderContainer.prototype.getVerticalScrollLength = function getVerticalScrollLength() {
@@ -260,9 +234,9 @@ angular.module('ui.grid')
 
     var ret = self.canvasWidth;
 
-    if (typeof(self.verticalScrollbarWidth) !== 'undefined' && self.verticalScrollbarWidth !== undefined && self.verticalScrollbarWidth > 0) {
-      ret = ret - self.verticalScrollbarWidth;
-    }
+    //if (typeof(self.verticalScrollbarWidth) !== 'undefined' && self.verticalScrollbarWidth !== undefined && self.verticalScrollbarWidth > 0) {
+    //  ret = ret - self.verticalScrollbarWidth;
+    //}
 
     return ret;
   };
@@ -506,9 +480,9 @@ angular.module('ui.grid')
     // Get the width of the viewport
     var availableWidth = self.getViewportWidth();
 
-    if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
-      availableWidth = availableWidth + self.grid.verticalScrollbarWidth;
-    }
+    //if (typeof(self.grid.verticalScrollbarWidth) !== 'undefined' && self.grid.verticalScrollbarWidth !== undefined && self.grid.verticalScrollbarWidth > 0) {
+    //  availableWidth = availableWidth + self.grid.verticalScrollbarWidth;
+    //}
 
     // The total number of columns
     // var equalWidthColumnCount = columnCount = uiGridCtrl.grid.options.columnDefs.length;
@@ -692,9 +666,9 @@ angular.module('ui.grid')
     });
 
     // Add the vertical scrollbar width back in to the canvas width, it's taken out in getCanvasWidth
-    if (self.grid.verticalScrollbarWidth) {
-      canvasWidth = canvasWidth + self.grid.verticalScrollbarWidth;
-    }
+    //if (self.grid.verticalScrollbarWidth) {
+    //  canvasWidth = canvasWidth + self.grid.verticalScrollbarWidth;
+    //}
     // canvasWidth = canvasWidth + 1;
 
     self.canvasWidth = parseInt(canvasWidth, 10);
@@ -706,20 +680,32 @@ angular.module('ui.grid')
     this.columnStyles = ret;
   };
 
-  GridRenderContainer.prototype.getScrollHeightOffset = function () {
-    return this.overflowY === 'hidden' ? this.grid.scrollbarHeight : 0;
-  };
-
   GridRenderContainer.prototype.getViewPortStyle = function () {
     var self = this;
     var styles = {};
 
-    styles['overflow-x'] = self.overflowX;
-    styles['overflow-y'] = self.overflowY;
+    if (self.name === 'body') {
+      styles['overflow-x'] = 'scroll';
+      if (self.grid.hasRightContainerColumns()) {
+        styles['overflow-y'] = 'hidden';
+      }
+      else {
+        styles['overflow-y'] = 'scroll';
+      }
+    }
+    else if (self.name === 'left') {
+      styles['overflow-x'] = 'hidden';
+      styles['overflow-y'] = 'hidden';
+    }
+    else {
+      styles['overflow-x'] = 'hidden';
+      styles['overflow-y'] = 'scroll';
+    }
 
     // if (self.grid.isRTL()) {
 
     return styles;
+
 
   };
 

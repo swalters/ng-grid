@@ -561,9 +561,9 @@
           var rightBound = grid.renderContainers.body.prevScrollLeft + grid.gridWidth;
 
           // If there's a vertical scrollbar, subtract it from the right boundary or we'll allow it to obscure cells
-          if (grid.verticalScrollbarWidth) {
-            rightBound = rightBound - grid.verticalScrollbarWidth;
-          }
+          //if (grid.verticalScrollbarWidth) {
+          //  rightBound = rightBound - grid.verticalScrollbarWidth;
+          //}
 
           // We were given a row to scroll to
           if (gridRow !== null) {
