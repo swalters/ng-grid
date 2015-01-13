@@ -22,6 +22,8 @@
             $scope.colContainer = containerCtrl.colContainer;
             $scope.getExternalScopes = uiGridCtrl.getExternalScopes;
 
+
+
             containerCtrl.header = $elm;
             containerCtrl.colContainer.header = $elm;
             

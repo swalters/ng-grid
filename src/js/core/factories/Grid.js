@@ -118,6 +118,16 @@ angular.module('ui.grid')
       self.isScrollingHorizontally = true;
       debouncedHorizontal();
     };
+
+    self.scrollbarHeight = 0;
+    self.scrollbarWidth = 0;
+    if (self.options.enableHorizontalScrollbar === uiGridConstants.scrollbars.ALWAYS) {
+      self.scrollbarHeight = gridUtil.getScrollbarWidth();
+    }
+
+    if (self.options.enableVerticalScrollbar === uiGridConstants.scrollbars.ALWAYS) {
+      self.scrollbarWidth = gridUtil.getScrollbarWidth();
+    }
   
   
   
@@ -943,6 +953,14 @@ angular.module('ui.grid')
    */
   Grid.prototype.registerStyleComputation = function registerStyleComputation(styleComputationInfo) {
     this.styleComputations.push(styleComputationInfo);
+  };
+
+  Grid.prototype.getScrollbarWidthStyle = function () {
+    return {width: this.scrollbarWidth +  'px'};
+  };
+
+  Grid.prototype.getScrollbarHeightStyle = function () {
+    return {height: this.scrollbarHeight +  'px'};
   };
 
 

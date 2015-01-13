@@ -49,6 +49,25 @@ angular.module('ui.grid')
       angular.extend(self, options);
     }
 
+    if (self.name === 'body') {
+      self.overflowX = 'scroll';
+      if (self.grid.hasRightContainerColumns()) {
+        self.overflowY = 'hidden';
+      }
+      else {
+        self.overflowY = 'scroll';
+      }
+    }
+    else if (self.name === 'left') {
+      self.overflowX = 'hidden';
+      self.overflowY = 'hidden';
+    }
+    else {
+      self.overflowX = 'hidden';
+      self.overflowY = 'scroll';
+    }
+
+
     grid.registerStyleComputation({
       priority: 5,
       func: function () {
@@ -229,7 +248,7 @@ angular.module('ui.grid')
       ret = ret - self.grid.horizontalScrollbarHeight;
     }
 
-    return ret;
+    return ret + this.getScrollHeightOffset();
   };
 
   GridRenderContainer.prototype.getVerticalScrollLength = function getVerticalScrollLength() {
@@ -687,27 +706,16 @@ angular.module('ui.grid')
     this.columnStyles = ret;
   };
 
+  GridRenderContainer.prototype.getScrollHeightOffset = function () {
+    return this.overflowY === 'hidden' ? this.grid.scrollbarHeight : 0;
+  };
+
   GridRenderContainer.prototype.getViewPortStyle = function () {
     var self = this;
     var styles = {};
 
-    if (self.name === 'body') {
-      styles['overflow-x'] = 'scroll';
-      if (self.grid.hasRightContainerColumns()) {
-        styles['overflow-y'] = 'hidden';
-      }
-      else {
-        styles['overflow-y'] = 'scroll';
-      }
-    }
-    else if (self.name === 'left') {
-      styles['overflow-x'] = 'hidden';
-      styles['overflow-y'] = 'hidden';
-    }
-    else {
-      styles['overflow-x'] = 'hidden';
-      styles['overflow-y'] = 'scroll';
-    }
+    styles['overflow-x'] = self.overflowX;
+    styles['overflow-y'] = self.overflowY;
 
     // if (self.grid.isRTL()) {
 
