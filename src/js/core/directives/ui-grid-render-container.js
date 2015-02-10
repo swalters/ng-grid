@@ -1,3 +1,4 @@
+/*global WheelEvent */
 (function () {
   'use strict';
 
@@ -63,6 +64,7 @@
             var colContainer = containerCtrl.colContainer;
 
             var renderContainer = grid.renderContainers[$scope.containerId];
+            renderContainer.canvasElement = $elm[0].getElementsByClassName('ui-grid-canvas')[0];
 
             // Put the container name on this element as a class
             $elm.addClass('ui-grid-render-container-' + $scope.containerId);
@@ -121,45 +123,27 @@
 
             // Scroll the render container viewport when the mousewheel is used
             $elm.bind('wheel mousewheel DomMouseScroll MozMousePixelScroll', function(evt) {
-              // use wheelDeltaY
+              if (rowContainer.name === 'left' || rowContainer.name === 'body') {
 
-              var newEvent = gridUtil.normalizeWheelEvent(evt);
+                var element = grid.renderContainers.right.canvasElement;
+                var newEvent = new WheelEvent(evt.type, {
+                  deltaX: evt.deltaX,
+                  deltaY: evt.deltaY,
+                  deltaZ: evt.deltaZ,
+                  deltaMode: evt.deltaMode
+                });
+            //    angular.extend(newEvent,evt);
+                if (document.createEvent) {
+                  // dispatch for firefox + others
+                  element.dispatchEvent(newEvent);
+                } else {
+                  // dispatch for IE
+                  newEvent = document.createEventObject();
+                  element.fireEvent('on' + newEvent, newEvent);
+                }
 
-              var scrollEvent = new ScrollEvent(grid, rowContainer, colContainer, ScrollEvent.Sources.RenderContainerMouseWheel);
-              if (newEvent.deltaY !== 0) {
-                var scrollYAmount = newEvent.deltaY * -120;
-
-                // Get the scroll percentage
-                var scrollYPercentage = (containerCtrl.viewport[0].scrollTop + scrollYAmount) / rowContainer.getVerticalScrollLength();
-
-                // Keep scrollPercentage within the range 0-1.
-                if (scrollYPercentage < 0) { scrollYPercentage = 0; }
-                else if (scrollYPercentage > 1) { scrollYPercentage = 1; }
-
-                scrollEvent.y = { percentage: scrollYPercentage, pixels: scrollYAmount };
+                evt.preventDefault();
               }
-              if (newEvent.deltaX !== 0) {
-                var scrollXAmount = newEvent.deltaX * -120;
-
-                // Get the scroll percentage
-                var scrollLeft = gridUtil.normalizeScrollLeft(containerCtrl.viewport);
-                var scrollXPercentage = (scrollLeft + scrollXAmount) / (colContainer.getCanvasWidth() - colContainer.getViewportWidth());
-
-                // Keep scrollPercentage within the range 0-1.
-                if (scrollXPercentage < 0) { scrollXPercentage = 0; }
-                else if (scrollXPercentage > 1) { scrollXPercentage = 1; }
-
-                scrollEvent.x = { percentage: scrollXPercentage, pixels: scrollXAmount };
-              }
-
-              // todo: this isn't working when scrolling down.  it works fine for up.  tested on Chrome
-              // Let the parent container scroll if the grid is already at the top/bottom
-                if ((scrollEvent.y && scrollEvent.y.percentage !== 0 && scrollEvent.y.percentage !== 1 && containerCtrl.viewport[0].scrollTop !== 0 ) ||
-                    (scrollEvent.x && scrollEvent.x.percentage !== 0 && scrollEvent.x.percentage !== 1)) {
-                  evt.preventDefault();
-              }
-
-              scrollEvent.fireThrottledScrollingEvent();
             });
 
             var startY = 0,
@@ -327,7 +311,12 @@
               var footerViewportWidth = colContainer.getHeaderViewportWidth();
               
               // Set canvas dimensions
-              ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas { width: ' + canvasWidth + 'px; height: ' + canvasHeight + 'px; }';
+              if ($scope.containerId === 'body') {
+                ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas { width: ' + canvasWidth + 'px; height: ' + canvasHeight + 'px; }';
+              }
+              else { //no width for pinned containers
+                ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-canvas{ width: 200px; height: ' + canvasHeight + 'px; }';
+              }
 
               ret += '\n .grid' + uiGridCtrl.grid.id + ' .ui-grid-render-container-' + $scope.containerId + ' .ui-grid-header-canvas { width: ' + (canvasWidth + grid.scrollbarWidth) + 'px; }';
               
