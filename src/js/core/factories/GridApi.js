@@ -127,6 +127,14 @@
 
           /**
            * @ngdoc event
+           * @name scrollEnded
+           * @eventOf  ui.grid.core.api:PublicApi
+           * @description  is raised when scroll has finished.  Is throttled, so won't be raised too frequently
+           */
+          this.registerEvent( 'core', 'scrollEnded' );
+
+          /**
+           * @ngdoc event
            * @name canvasHeightChanged
            * @eventOf  ui.grid.core.api:PublicApi
            * @description  is raised when the canvas height has changed

@@ -73,12 +73,7 @@
             }
 
             function scrollHandler (args) {
-              // exit if not for this grid
-              if (args.grid && args.grid.id !== grid.id){
-                return;
-              }
 
-              
               // Vertical scroll
               if (args.y && $scope.bindScrollVertical) {
                 containerCtrl.prevScrollArgs = args;

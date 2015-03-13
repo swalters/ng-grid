@@ -611,7 +611,28 @@ angular.module('ui.grid')
     return prefixDot ? '.' + cls : cls;
   };
 
-  /**
+    /**
+     * @ngdoc function
+     * @name isPinnedLeft
+     * @methodOf ui.grid.class:GridColumn
+     * @description Returns true if column is in the left render container
+     */
+    GridColumn.prototype.isPinnedLeft = function () {
+      return this.renderContainer === 'left';
+    };
+
+    /**
+     * @ngdoc function
+     * @name isPinnedRight
+     * @methodOf ui.grid.class:GridColumn
+     * @description Returns true if column is in the right render container
+     */
+    GridColumn.prototype.isPinnedRight = function () {
+      return this.renderContainer === 'right';
+    };
+
+
+    /**
    * @ngdoc function
    * @name getColClassDefinition
    * @methodOf ui.grid.class:GridColumn

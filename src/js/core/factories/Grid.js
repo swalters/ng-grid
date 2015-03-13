@@ -111,13 +111,15 @@ angular.module('ui.grid')
 
     var debouncedVertical = gridUtil.debounce(function () {
       self.isScrollingVertically = false;
+      self.api.core.raise.scrollEnded(self.scrollDirection);
       self.scrollDirection = uiGridConstants.scrollDirection.NONE;
-    }, 1000);
+    }, 300);
   
     var debouncedHorizontal = gridUtil.debounce(function () {
       self.isScrollingHorizontally = false;
+      self.api.core.raise.scrollEnded(self.scrollDirection);
       self.scrollDirection = uiGridConstants.scrollDirection.NONE;
-    }, 1000);
+    }, 300);
   
   
     /**

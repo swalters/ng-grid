@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  angular.module('ui.grid').directive('uiGridViewport', ['gridUtil','ScrollEvent','uiGridConstants',
+  angular.module('ui.grid').directive('uiGridViewport', ['gridUtil','ScrollEvent','uiGridConstants', '$window',
     function(gridUtil, ScrollEvent, uiGridConstants) {
       return {
         replace: true,
@@ -31,62 +31,31 @@
           // Register this viewport with its container 
           containerCtrl.viewport = $elm;
 
-          $elm.on('scroll', function (evt) {
+         // var throttledScrollHandler = gridUtil.throttle(scrollHandler, 5, {trailing: true});
+
+          $elm.on('scroll', scrollHandler);
+
+          function scrollHandler() {
             var newScrollTop = $elm[0].scrollTop;
-            // var newScrollLeft = $elm[0].scrollLeft;
             var newScrollLeft = gridUtil.normalizeScrollLeft($elm);
-            var horizScrollPercentage = -1;
-            var vertScrollPercentage = -1;
 
-            // Handle RTL here
+            var vertScrollPercentage = rowContainer.scrollVertical(newScrollTop);
+            var horizScrollPercentage = colContainer.scrollVertical(newScrollLeft);
 
-            if (newScrollLeft !== colContainer.prevScrollLeft) {
-              grid.flagScrollingHorizontally();
-              var xDiff = newScrollLeft - colContainer.prevScrollLeft;
-
-              if (xDiff > 0) { grid.scrollDirection = uiGridConstants.scrollDirection.RIGHT; }
-              if (xDiff < 0) { grid.scrollDirection = uiGridConstants.scrollDirection.LEFT; }
-
-              var horizScrollLength = (colContainer.getCanvasWidth() - colContainer.getViewportWidth());
-              if (horizScrollLength !== 0) {
-                horizScrollPercentage = newScrollLeft / horizScrollLength;
-              }
-              else {
-                horizScrollPercentage = 0;
-              }
-
-              colContainer.adjustScrollHorizontal(newScrollLeft, horizScrollPercentage);
+            var scrollEvent = new ScrollEvent(grid, rowContainer, colContainer, ScrollEvent.Sources.ViewPortScroll);
+            scrollEvent.newScrollLeft = newScrollLeft;
+            scrollEvent.newScrollTop = newScrollTop;
+            if ( horizScrollPercentage > -1 ){
+              scrollEvent.x = { percentage: horizScrollPercentage };
             }
 
-            if (newScrollTop !== rowContainer.prevScrollTop) {
-              grid.flagScrollingVertically();
-              var yDiff = newScrollTop - rowContainer.prevScrollTop;
-
-              if (yDiff > 0 ) { grid.scrollDirection = uiGridConstants.scrollDirection.DOWN; }
-              if (yDiff < 0 ) { grid.scrollDirection = uiGridConstants.scrollDirection.UP; }
-
-              var vertScrollLength = rowContainer.getVerticalScrollLength();
-
-              vertScrollPercentage = newScrollTop / vertScrollLength;
-
-              if (vertScrollPercentage > 1) { vertScrollPercentage = 1; }
-              if (vertScrollPercentage < 0) { vertScrollPercentage = 0; }
-              
-              rowContainer.adjustScrollVertical(newScrollTop, vertScrollPercentage);
+            if ( vertScrollPercentage > -1 ){
+              scrollEvent.y = { percentage: vertScrollPercentage };
             }
+            scrollEvent.fireScrollingEvent();
+          }
 
-              var scrollEvent = new ScrollEvent(grid, rowContainer, colContainer, ScrollEvent.Sources.ViewPortScroll);
-              scrollEvent.newScrollLeft = newScrollLeft;
-              scrollEvent.newScrollTop = newScrollTop;
-              if ( horizScrollPercentage > -1 ){
-                scrollEvent.x = { percentage: horizScrollPercentage };
-              }
 
-              if ( vertScrollPercentage > -1 ){
-                scrollEvent.y = { percentage: vertScrollPercentage };
-              }
-              scrollEvent.fireScrollingEvent();
-          });
         },
         controller: ['$scope', function ($scope) {
           this.rowStyle = function (index) {
