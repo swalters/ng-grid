@@ -62,7 +62,9 @@ angular.module('ui.grid')
     self.viewportAdjusters = [];
     self.rowHeaderColumns = [];
     self.dataChangeCallbacks = {};
-  
+    self.verticalScrollSyncCallBackFns = {};
+    self.horizontalScrollSyncCallBackFns = {};
+
     // self.visibleRowCache = [];
   
     // Set of 'render' containers for self grid, which can render sets of rows
@@ -109,17 +111,21 @@ angular.module('ui.grid')
      */
     self.scrollDirection = uiGridConstants.scrollDirection.NONE;
 
-    var debouncedVertical = gridUtil.debounce(function () {
+    function vertical (scrollEvent) {
       self.isScrollingVertically = false;
-      self.api.core.raise.scrollEnded(self.scrollDirection);
+      self.api.core.raise.scrollEnd(scrollEvent);
       self.scrollDirection = uiGridConstants.scrollDirection.NONE;
-    }, 300);
-  
-    var debouncedHorizontal = gridUtil.debounce(function () {
+    }
+
+    var debouncedVertical = gridUtil.debounce(vertical, self.options.scrollDebounce);
+
+    function horizontal (scrollEvent) {
       self.isScrollingHorizontally = false;
-      self.api.core.raise.scrollEnded(self.scrollDirection);
+      self.api.core.raise.scrollEnd(scrollEvent);
       self.scrollDirection = uiGridConstants.scrollDirection.NONE;
-    }, 300);
+    }
+
+    var debouncedHorizontal = gridUtil.debounce(horizontal, self.options.scrollDebounce);
   
   
     /**
@@ -128,9 +134,17 @@ angular.module('ui.grid')
      * @methodOf ui.grid.class:Grid
      * @description sets isScrollingVertically to true and sets it to false in a debounced function
      */
-    self.flagScrollingVertically = function() {
+    self.flagScrollingVertically = function(scrollEvent) {
+      if (!self.isScrollingVertically && !self.isScrollingHorizontally) {
+        self.api.core.raise.scrollBegin(scrollEvent);
+      }
       self.isScrollingVertically = true;
-      debouncedVertical();
+      if (self.options.scrollDebounce === 0) {
+        vertical(scrollEvent);
+      }
+      else {
+        debouncedVertical(scrollEvent);
+      }
     };
   
     /**
@@ -139,9 +153,17 @@ angular.module('ui.grid')
      * @methodOf ui.grid.class:Grid
      * @description sets isScrollingHorizontally to true and sets it to false in a debounced function
      */
-    self.flagScrollingHorizontally = function() {
+    self.flagScrollingHorizontally = function(scrollEvent) {
+      if (!self.isScrollingVertically && !self.isScrollingHorizontally) {
+        self.api.core.raise.scrollBegin(scrollEvent);
+      }
       self.isScrollingHorizontally = true;
-      debouncedHorizontal();
+      if (self.options.scrollDebounce === 0) {
+        horizontal(scrollEvent);
+      }
+      else {
+        debouncedHorizontal(scrollEvent);
+      }
     };
 
     self.scrollbarHeight = 0;
@@ -1631,6 +1653,67 @@ angular.module('ui.grid')
     //}
 
     return viewPortWidth;
+  };
+
+  Grid.prototype.addVerticalScrollSync = function (containerId, callBackFn) {
+    this.verticalScrollSyncCallBackFns[containerId] = callBackFn;
+  };
+
+  Grid.prototype.addHorizontalScrollSync = function (containerId, callBackFn) {
+    this.horizontalScrollSyncCallBackFns[containerId] = callBackFn;
+  };
+
+/**
+ * Scroll needed containers by calling their ScrollSyncs
+ * @param sourceContainerId the containerId that has already set it's top/left.
+ *         can be empty string which means all containers need to set top/left
+ * @param scrollEvent
+ */
+  Grid.prototype.scrollContainers = function (sourceContainerId, scrollEvent) {
+
+    if (scrollEvent.y) {
+      //default for no container Id (ex. mousewheel means that all containers must set scrollTop/Left)
+      var verts = ['body','left', 'right'];
+
+      this.flagScrollingVertically(scrollEvent);
+
+      if (sourceContainerId === 'body') {
+        verts = ['left', 'right'];
+      }
+      else if (sourceContainerId === 'left') {
+        verts = ['body', 'right'];
+      }
+      else if (sourceContainerId === 'right') {
+        verts = ['left', 'body'];
+      }
+
+      for (var i = 0; i < verts.length; i++) {
+        var id = verts[i];
+        if (this.verticalScrollSyncCallBackFns[id]) {
+          this.verticalScrollSyncCallBackFns[id](scrollEvent);
+        }
+      }
+
+    }
+
+    if (scrollEvent.x) {
+      //default for no container Id (ex. mousewheel means that all containers must set scrollTop/Left)
+      var horizs = ['body','bodyheader', 'bodyfooter'];
+
+      this.flagScrollingHorizontally(scrollEvent);
+      if (sourceContainerId === 'body') {
+        horizs = ['bodyheader', 'bodyfooter'];
+      }
+
+      for (var j = 0; j < horizs.length; j++) {
+        var idh = horizs[j];
+        if (this.horizontalScrollSyncCallBackFns[idh]) {
+          this.horizontalScrollSyncCallBackFns[idh](scrollEvent);
+        }
+      }
+
+    }
+
   };
 
   Grid.prototype.registerViewportAdjuster = function registerViewportAdjuster(func) {

@@ -40,7 +40,7 @@
             var newScrollLeft = gridUtil.normalizeScrollLeft($elm);
 
             var vertScrollPercentage = rowContainer.scrollVertical(newScrollTop);
-            var horizScrollPercentage = colContainer.scrollVertical(newScrollLeft);
+            var horizScrollPercentage = colContainer.scrollHorizontal(newScrollLeft);
 
             var scrollEvent = new ScrollEvent(grid, rowContainer, colContainer, ScrollEvent.Sources.ViewPortScroll);
             scrollEvent.newScrollLeft = newScrollLeft;
@@ -52,7 +52,47 @@
             if ( vertScrollPercentage > -1 ){
               scrollEvent.y = { percentage: vertScrollPercentage };
             }
-            scrollEvent.fireScrollingEvent();
+
+            grid.scrollContainers($scope.$parent.containerId, scrollEvent);
+
+           // scrollEvent.fireScrollingEvent();
+          }
+
+          if ($scope.$parent.bindScrollVertical) {
+            grid.addVerticalScrollSync($scope.$parent.containerId, syncVerticalScroll);
+          }
+
+          if ($scope.$parent.bindScrollHorizontal) {
+            grid.addHorizontalScrollSync($scope.$parent.containerId, syncHorizontalScroll);
+            grid.addHorizontalScrollSync($scope.$parent.containerId + 'header', syncHorizontalHeader);
+            grid.addHorizontalScrollSync($scope.$parent.containerId + 'footer', syncHorizontalFooter);
+          }
+
+          function syncVerticalScroll(scrollEvent){
+            containerCtrl.prevScrollArgs = scrollEvent;
+            var newScrollTop = scrollEvent.getNewScrollTop(rowContainer,containerCtrl.viewport);
+            $elm[0].scrollTop = newScrollTop;
+
+          }
+
+          function syncHorizontalScroll(scrollEvent){
+            containerCtrl.prevScrollArgs = scrollEvent;
+            var newScrollLeft = scrollEvent.getNewScrollLeft(colContainer, containerCtrl.viewport);
+            $elm[0].scrollLeft = newScrollLeft;
+          }
+
+          function syncHorizontalHeader(scrollEvent){
+            var newScrollLeft = scrollEvent.getNewScrollLeft(colContainer, containerCtrl.viewport);
+            if (containerCtrl.headerViewport) {
+              containerCtrl.headerViewport.scrollLeft = newScrollLeft;
+            }
+          }
+
+          function syncHorizontalFooter(scrollEvent){
+            var newScrollLeft = scrollEvent.getNewScrollLeft(colContainer, containerCtrl.viewport);
+            if (containerCtrl.footerViewport) {
+              containerCtrl.footerViewport.scrollLeft = newScrollLeft;
+            }
           }
 
 

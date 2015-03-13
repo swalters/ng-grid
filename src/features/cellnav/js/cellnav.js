@@ -581,7 +581,7 @@
           }
 
           if (scrollEvent.y || scrollEvent.x) {
-            scrollEvent.fireScrollingEvent();
+            grid.scrollContainers('', scrollEvent);
           }
         },
 
@@ -728,7 +728,7 @@
 
           // If we need to scroll on either the x or y axes, fire a scroll event
           if (scrollEvent.y || scrollEvent.x) {
-            scrollEvent.fireScrollingEvent();
+            grid.scrollContainers('',scrollEvent);
           }
         },
 
@@ -965,11 +965,42 @@
 
               var needFocus = false;
 
-              grid.api.core.on.scrollEnded($scope, function (args) {
+              grid.api.core.on.scrollBegin($scope, function (args) {
 
-                $log.log("handle scrollended in cellNav");
+                $log.log("handle scrollBegin in cellNav");
+
                 // Skip if there's no currently-focused cell
-                if (uiGridCtrl.grid.api.cellNav.getFocusedCell() == null) {
+                var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
+                if (lastRowCol == null) {
+                  return;
+                }
+
+                //if not in my container, move on
+                //todo: worry about horiz scroll
+                if (!renderContainerCtrl.colContainer.containsColumn(lastRowCol.col)) {
+                  return;
+                }
+
+               //clear dom of focused cell
+
+                 var elements = $elm[0].getElementsByClassName('ui-grid-cell-focus');
+                 Array.prototype.forEach.call(elements,function(e){angular.element(e).removeClass('ui-grid-cell-focus');});
+
+              });
+
+              grid.api.core.on.scrollEnd($scope, function (args) {
+
+                $log.log("handle scrollEnd in cellNav");
+
+                // Skip if there's no currently-focused cell
+                var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
+                if (lastRowCol == null) {
+                  return;
+                }
+
+                //if not in my container, move on
+                //todo: worry about horiz scroll
+                if (!renderContainerCtrl.colContainer.containsColumn(lastRowCol.col)) {
                   return;
                 }
 
@@ -981,7 +1012,7 @@
                   $elm[0].focus();
                 }
 
-                var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
+
                 $timeout(function () {
                   uiGridCtrl.cellNav.broadcastCellNav(lastRowCol);
                 });

@@ -210,7 +210,7 @@
           scope: false,
           link: function ($scope, $elm, $attr){
             if ($scope.grid.options.enableInfiniteScroll) {
-              $scope.grid.api.core.on.scrollEvent($scope, function (args) {
+              $scope.grid.api.core.on.scrollEnd($scope, function (args) {
                   //Prevent circular scroll references, if source is coming from ui.grid.adjustInfiniteScrollPosition() function
                   if (args.y && (args.source !== 'ui.grid.adjustInfiniteScrollPosition')) {
                     var percentage = 100 - (args.y.percentage * 100);

@@ -90,6 +90,11 @@ angular.module('ui.grid')
 
   // TODO(c0bra): calculate size?? Should this be in a stackable directive?
 
+
+  GridRenderContainer.prototype.containsColumn = function (col) {
+     return this.visibleColumnCache.indexOf(col) !== -1;
+  };
+
   GridRenderContainer.prototype.minRowsToRender = function minRowsToRender() {
     var self = this;
     var minRows = 0;
@@ -190,9 +195,9 @@ angular.module('ui.grid')
     var viewPortHeight = self.grid.gridHeight - headerHeight - self.grid.footerHeight;
 
 
- //   var adjustment = self.getViewportAdjustment();
+    var adjustment = self.getViewportAdjustment();
     
-   // viewPortHeight = viewPortHeight + adjustment.height;
+    viewPortHeight = viewPortHeight + adjustment.height;
 
     return viewPortHeight;
   };
@@ -309,7 +314,6 @@ angular.module('ui.grid')
     var vertScrollPercentage = -1;
 
     if (newScrollTop !== this.prevScrollTop) {
-      this.grid.flagScrollingVertically();
       var yDiff = newScrollTop - this.prevScrollTop;
 
       if (yDiff > 0 ) { this.grid.scrollDirection = uiGridConstants.scrollDirection.DOWN; }

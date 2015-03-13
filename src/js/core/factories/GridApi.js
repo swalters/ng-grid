@@ -119,19 +119,19 @@
 
           /**
            * @ngdoc event
-           * @name scrollEvent
+           * @name scrollBegin
            * @eventOf  ui.grid.core.api:PublicApi
-           * @description  is raised on a scroll Event.  Called frequently so be careful what you do with it
+           * @description  is raised when scroll begins.  Is throttled, so won't be raised too frequently
            */
-          this.registerEvent( 'core', 'scrollEvent' );
+          this.registerEvent( 'core', 'scrollBegin' );
 
           /**
            * @ngdoc event
-           * @name scrollEnded
+           * @name scrollEnd
            * @eventOf  ui.grid.core.api:PublicApi
            * @description  is raised when scroll has finished.  Is throttled, so won't be raised too frequently
            */
-          this.registerEvent( 'core', 'scrollEnded' );
+          this.registerEvent( 'core', 'scrollEnd' );
 
           /**
            * @ngdoc event

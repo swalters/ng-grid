@@ -68,9 +68,10 @@
             $elm.addClass('ui-grid-render-container-' + $scope.containerId);
 
             // Bind to left/right-scroll events
-            if ($scope.bindScrollHorizontal || $scope.bindScrollVertical) {
-              grid.api.core.on.scrollEvent($scope,scrollHandler);
-            }
+            //if ($scope.bindScrollHorizontal || $scope.bindScrollVertical) {
+            //  grid.api.core.on.scrollEvent($scope,scrollHandler);
+            //}
+
 
             function scrollHandler (args) {
 
@@ -92,6 +93,7 @@
               // Horizontal scroll
               if (args.x && $scope.bindScrollHorizontal) {
                 containerCtrl.prevScrollArgs = args;
+
                 var newScrollLeft = args.getNewScrollLeft(colContainer, containerCtrl.viewport);
 
                 // Make the current horizontal scroll position available in the $scope
@@ -149,7 +151,7 @@
                  (scrollEvent.x && scrollEvent.x.percentage !== 0 && scrollEvent.x.percentage !== 1)) {
 
                   event.preventDefault();
-                  scrollEvent.fireThrottledScrollingEvent();
+                  scrollEvent.fireThrottledScrollingEvent('', scrollEvent);
               }
             });
 

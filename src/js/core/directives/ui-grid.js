@@ -72,7 +72,7 @@
         else {
           scrollEvent.y = {percentage: percentage};
         }
-        scrollEvent.fireScrollingEvent();
+        scrollEvent.grid.scrollContainers('',scrollEvent);
 
       }
 

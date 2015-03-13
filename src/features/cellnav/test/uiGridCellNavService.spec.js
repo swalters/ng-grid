@@ -18,6 +18,8 @@ describe('ui.grid.edit uiGridCellNavService', function () {
     $templateCache.put('ui-grid/uiGridCell', '<div/>');
 
     grid = gridClassFactory.createGrid();
+    //throttled scrolling isn't working in tests for some reason
+    grid.options.scrollDebounce = 0;
     grid.options.columnDefs = [
       {name: 'col0', allowCellFocus: true},
       {name: 'col1', allowCellFocus: false},
@@ -200,7 +202,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
       $scope = $rootScope.$new();
 
       args = null;
-      grid.api.core.on.scrollEvent($scope, function( receivedArgs ){
+      grid.api.core.on.scrollEnd($scope, function( receivedArgs ){
         args = receivedArgs;
       });
       
@@ -212,7 +214,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
     // be, not that it is giving some specified result (i.e. I just updated them to what they were)
     it('should request scroll to row and column', function () {
       uiGridCellNavService.scrollTo( grid, grid.options.data[4], grid.columns[4].colDef);
-      
+
       expect(args.grid).toEqual(grid);
       expect(args.y).toEqual( { percentage : 5/11 });
       expect(isNaN(args.x.percentage)).toEqual( true );

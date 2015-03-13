@@ -286,11 +286,19 @@ angular.module('ui.grid')
   
       /**
        * @ngdoc property
-       * @name scrollThrottle
+       * @name wheelScrollThrottle
        * @propertyOf ui.grid.class:GridOptions
        * @description Default time to throttle scroll events to, defaults to 70ms
        */
-      baseOptions.scrollThrottle = typeof(baseOptions.scrollThrottle) !== "undefined" ? baseOptions.scrollThrottle : 70;
+      baseOptions.wheelScrollThrottle = typeof(baseOptions.wheelScrollThrottle) !== "undefined" ? baseOptions.wheelScrollThrottle : 70;
+
+      /**
+       * @ngdoc property
+       * @name scrollDebounce
+       * @propertyOf ui.grid.class:GridOptions
+       * @description Default time to debounce scroll events, defaults to 300ms
+       */
+      baseOptions.scrollDebounce = typeof(baseOptions.scrollDebounce) !== "undefined" ? baseOptions.scrollDebounce : 300;
   
       /**
        * @ngdoc boolean
