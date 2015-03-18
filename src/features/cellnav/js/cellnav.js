@@ -741,7 +741,6 @@
 
           // If we need to scroll on either the x or y axes, fire a scroll event
           if (scrollEvent.y || scrollEvent.x) {
-            scrollEvent.withDelay = false;
             grid.scrollContainers('',scrollEvent);
           }
         },
