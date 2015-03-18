@@ -251,10 +251,23 @@
         initializeGrid: function (grid) {
           grid.registerColumnBuilder(service.cellNavColumnBuilder);
 
-          //create variables for state
+
+          /**
+           *  @ngdoc object
+           *  @name ui.grid.cellNav:Grid.cellNav
+           * @description cellNav properties added to grid class
+           */
           grid.cellNav = {};
           grid.cellNav.lastRowCol = null;
           grid.cellNav.focusedCells = [];
+
+          /**
+           * @ngdoc object
+           * @name scrollTo
+           * @propertyOf ui.grid.cellNav:Grid.cellNav
+           * @description enables features to enable or disable Focusing after a scroll
+           */
+          grid.cellNav.focusAfterScroll = true;
 
           service.defaultGridOptions(grid.options);
 
@@ -728,6 +741,7 @@
 
           // If we need to scroll on either the x or y axes, fire a scroll event
           if (scrollEvent.y || scrollEvent.x) {
+            scrollEvent.withDelay = false;
             grid.scrollContainers('',scrollEvent);
           }
         },
@@ -967,7 +981,9 @@
 
               grid.api.core.on.scrollBegin($scope, function (args) {
 
-                $log.log("handle scrollBegin in cellNav");
+                if (!grid.cellNav.focusAfterScroll) {
+                  return;
+                }
 
                 // Skip if there's no currently-focused cell
                 var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
@@ -990,7 +1006,9 @@
 
               grid.api.core.on.scrollEnd($scope, function (args) {
 
-                $log.log("handle scrollEnd in cellNav");
+                //if (!grid.cellNav.focusAfterScroll) {
+                //  return;
+                //}
 
                 // Skip if there's no currently-focused cell
                 var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
@@ -1013,9 +1031,10 @@
                 }
 
 
-                $timeout(function () {
+               // $timeout(function () {
+                  lastRowCol.eventType = uiGridCellNavConstants.EVENT_TYPE.KEYDOWN;
                   uiGridCtrl.cellNav.broadcastCellNav(lastRowCol);
-                });
+             //   });
 
 
 

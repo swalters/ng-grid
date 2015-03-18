@@ -35,6 +35,7 @@ describe('GridOptions factory', function () {
         scrollThreshold: 4,
         excessColumns: 4,
         horizontalScrollThreshold: 2,
+        aggregationCalcThrottle: 1000,
         wheelScrollThrottle: 70,
         scrollDebounce: 300,
         enableSorting: true,
@@ -77,6 +78,7 @@ describe('GridOptions factory', function () {
         scrollThreshold: 6,
         excessColumns: 7,
         horizontalScrollThreshold: 3,
+        aggregationCalcThrottle: 1000,
         wheelScrollThrottle: 75,
         enableSorting: true,
         enableFiltering: true,
@@ -115,6 +117,7 @@ describe('GridOptions factory', function () {
         scrollThreshold: 6,
         excessColumns: 7,
         horizontalScrollThreshold: 3,
+        aggregationCalcThrottle: 1000,
         wheelScrollThrottle: 75,
         scrollDebounce: 300,
         enableSorting: true,
@@ -132,7 +135,7 @@ describe('GridOptions factory', function () {
       });
     });
 
-    it('false and values', function() {
+    iit('false and values', function() {
       var testFunction = function() {};
       var options = {
         onRegisterApi: testFunction,
@@ -158,6 +161,7 @@ describe('GridOptions factory', function () {
         scrollThreshold: 6,
         excessColumns: 7,
         horizontalScrollThreshold: 3,
+        aggregationCalcThrottle: 1000,
         wheelScrollThrottle: 75,
         enableFiltering: false,
         enableSorting: false,
@@ -195,6 +199,7 @@ describe('GridOptions factory', function () {
         scrollThreshold: 6,
         excessColumns: 7,
         horizontalScrollThreshold: 3,
+        aggregationCalcThrottle: 1000,
         wheelScrollThrottle: 75,
         scrollDebounce: 300,
         enableSorting: false,

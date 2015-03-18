@@ -139,7 +139,7 @@ angular.module('ui.grid')
         self.api.core.raise.scrollBegin(scrollEvent);
       }
       self.isScrollingVertically = true;
-      if (self.options.scrollDebounce === 0) {
+      if (self.options.scrollDebounce === 0 || !scrollEvent.withDelay) {
         vertical(scrollEvent);
       }
       else {
@@ -158,7 +158,7 @@ angular.module('ui.grid')
         self.api.core.raise.scrollBegin(scrollEvent);
       }
       self.isScrollingHorizontally = true;
-      if (self.options.scrollDebounce === 0) {
+      if (self.options.scrollDebounce === 0 || !scrollEvent.withDelay) {
         horizontal(scrollEvent);
       }
       else {

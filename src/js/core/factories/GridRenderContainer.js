@@ -337,7 +337,6 @@ angular.module('ui.grid')
     // Handle RTL here
 
     if (newScrollLeft !== this.prevScrollLeft) {
-      this.grid.flagScrollingHorizontally();
       var xDiff = newScrollLeft - this.prevScrollLeft;
 
       if (xDiff > 0) { this.grid.scrollDirection = uiGridConstants.scrollDirection.RIGHT; }

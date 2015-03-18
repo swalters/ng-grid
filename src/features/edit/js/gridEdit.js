@@ -459,7 +459,7 @@
             }
 
             function beginEditFocus(evt) {
-              // gridUtil.logDebug('begin edit');
+              gridUtil.logDebug('begin edit focus');
               if (uiGridCtrl && uiGridCtrl.cellNav) {
                 // NOTE(c0bra): This is causing a loop where focusCell causes beginEditFocus to be called....
                 uiGridCtrl.cellNav.focusCell($scope.row, $scope.col);
@@ -494,6 +494,7 @@
             catch (e) {}
 
             function beginEditKeyDown(evt) {
+              gridUtil.logDebug('beginEditKeyDown');
               if (uiGridEditService.isStartEditKey(evt)) {
                 beginEdit();
               }
@@ -598,14 +599,18 @@
               }
 
               if (!shouldEdit($scope.col, $scope.row)) {
+                gridUtil.logDebug('returning because of should edit');
                 return;
               }
 
               // if the cell isn't fully visible, and cellNav is present, scroll it to be fully visible before we start
               if ( $scope.grid.api.cellNav ){
-                $scope.grid.api.cellNav.scrollToIfNecessary( $scope.row, $scope.col );
+                $scope.grid.cellNav.focusAfterScroll = false;
+               // $scope.grid.api.cellNav.scrollToIfNecessary( $scope.row, $scope.col );
+               // gridUtil.logDebug('after scrollToIfNecessary');
               }
-              
+
+              gridUtil.logDebug('in begin edit');
               cellModel = $parse($scope.row.getQualifiedColField($scope.col));
               //get original value from the cell
               origCellValue = cellModel($scope);
@@ -689,6 +694,10 @@
             }
 
             function endEdit(retainFocus) {
+              if ( $scope.grid.api.cellNav ){
+                $scope.grid.cellNav.focusAfterScroll = true;
+              }
+
               if (!inEdit) {
                 return;
               }
