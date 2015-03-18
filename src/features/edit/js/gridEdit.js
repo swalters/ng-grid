@@ -52,6 +52,7 @@
           service.defaultGridOptions(grid.options);
 
           grid.registerColumnBuilder(service.editColumnBuilder);
+          grid.edit = {};
 
           /**
            *  @ngdoc object
@@ -462,7 +463,7 @@
               gridUtil.logDebug('begin edit focus');
               if (uiGridCtrl && uiGridCtrl.cellNav) {
                 // NOTE(c0bra): This is causing a loop where focusCell causes beginEditFocus to be called....
-                uiGridCtrl.cellNav.focusCell($scope.row, $scope.col);
+                //uiGridCtrl.cellNav.focusCell($scope.row, $scope.col);
               }
 
               evt.stopPropagation();
@@ -472,29 +473,28 @@
             // If the cellNagv module is installed and we can get the uiGridCellNavConstants value injected,
             //   then if the column has enableCellEditOnFocus set to true, we need to listen for cellNav events
             //   to this cell and start editing when the "focus" reaches us
-            try {
-              var uiGridCellNavConstants = $injector.get('uiGridCellNavConstants');
-
-              if ($scope.col.colDef.enableCellEditOnFocus) {
-                $scope.$on(uiGridCellNavConstants.CELL_NAV_EVENT, function (evt, rowCol) {
-                  if (rowCol.row === $scope.row && rowCol.col === $scope.col) {
-                    // @PaulL: ugly nested timeout.  Without this, this same scroll event ends the editing before it gets started
-                    // Issue #2896 raised to fix this situation
-                    $timeout(function() {
-                      $timeout(function() {
-                        beginEdit();
-                      });
-                    });
-                  } else {
-                    endEdit();
-                  }
-                });
-              }
-            }
-            catch (e) {}
+            //try {
+            //  var uiGridCellNavConstants = $injector.get('uiGridCellNavConstants');
+            //
+            //  if ($scope.col.colDef.enableCellEditOnFocus) {
+            //    $scope.$on(uiGridCellNavConstants.CELL_NAV_EVENT, function (evt, rowCol) {
+            //      if (rowCol.row === $scope.row && rowCol.col === $scope.col) {
+            //        // @PaulL: ugly nested timeout.  Without this, this same scroll event ends the editing before it gets started
+            //        // Issue #2896 raised to fix this situation
+            //        $timeout(function() {
+            //          $timeout(function() {
+            //            beginEdit();
+            //          });
+            //        });
+            //      } else {
+            //        endEdit();
+            //      }
+            //    });
+            //  }
+            //}
+            //catch (e) {}
 
             function beginEditKeyDown(evt) {
-              gridUtil.logDebug('beginEditKeyDown');
               if (uiGridEditService.isStartEditKey(evt)) {
                 beginEdit();
               }
@@ -606,8 +606,7 @@
               // if the cell isn't fully visible, and cellNav is present, scroll it to be fully visible before we start
               if ( $scope.grid.api.cellNav ){
                 $scope.grid.cellNav.focusAfterScroll = false;
-               // $scope.grid.api.cellNav.scrollToIfNecessary( $scope.row, $scope.col );
-               // gridUtil.logDebug('after scrollToIfNecessary');
+                $scope.grid.api.cellNav.scrollToIfNecessary( $scope.row, $scope.col );
               }
 
               gridUtil.logDebug('in begin edit');
@@ -840,6 +839,7 @@
                   // Pass the keydown event off to the cellNav service, if it exists
                   else if (uiGridCtrl && uiGridCtrl.hasOwnProperty('cellNav') && renderContainerCtrl) {
                     evt.uiGridTargetRenderContainerId = renderContainerCtrl.containerId;
+                    uiGridCtrl.grid.edit.cellWasFocusedAfterEdit = true;
                     uiGridCtrl.cellNav.handleKeyDown(evt);
                   }
 

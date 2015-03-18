@@ -118,6 +118,7 @@ angular.module('ui.grid')
     }
 
     var debouncedVertical = gridUtil.debounce(vertical, self.options.scrollDebounce);
+    var debouncedVerticalMinDelay = gridUtil.debounce(vertical, 0);
 
     function horizontal (scrollEvent) {
       self.isScrollingHorizontally = false;
@@ -126,7 +127,8 @@ angular.module('ui.grid')
     }
 
     var debouncedHorizontal = gridUtil.debounce(horizontal, self.options.scrollDebounce);
-  
+    var debouncedHorizontalMinDelay = gridUtil.debounce(horizontal, 0);
+
   
     /**
      * @ngdoc function
@@ -140,7 +142,7 @@ angular.module('ui.grid')
       }
       self.isScrollingVertically = true;
       if (self.options.scrollDebounce === 0 || !scrollEvent.withDelay) {
-        vertical(scrollEvent);
+        debouncedVerticalMinDelay(scrollEvent);
       }
       else {
         debouncedVertical(scrollEvent);
@@ -159,7 +161,7 @@ angular.module('ui.grid')
       }
       self.isScrollingHorizontally = true;
       if (self.options.scrollDebounce === 0 || !scrollEvent.withDelay) {
-        horizontal(scrollEvent);
+        debouncedHorizontalMinDelay(scrollEvent);
       }
       else {
         debouncedHorizontal(scrollEvent);
@@ -1684,7 +1686,7 @@ angular.module('ui.grid')
         verts = ['body', 'right'];
       }
       else if (sourceContainerId === 'right') {
-        verts = ['left', 'body'];
+        verts = ['body', 'left'];
       }
 
       for (var i = 0; i < verts.length; i++) {

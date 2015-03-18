@@ -36,12 +36,13 @@
           $elm.on('scroll', scrollHandler);
 
           var ignoreScroll = false;
-          function scrollHandler() {
-            if (ignoreScroll) {
+          function scrollHandler(evt) {
+            if (ignoreScroll && (grid.isScrollingHorizontally || grid.isScrollingHorizontally)) {
               //don't ask for scrollTop if we just set it
               ignoreScroll = false;
               return;
             }
+
 
             ignoreScroll = true;
 
@@ -62,9 +63,11 @@
               scrollEvent.y = { percentage: vertScrollPercentage };
             }
 
+            if (grid.edit && grid.edit.cellWasFocusedAfterEdit) {
+              scrollEvent.withDelay = false;
+              grid.edit.cellWasFocusedAfterEdit = false;
+            }
             grid.scrollContainers($scope.$parent.containerId, scrollEvent);
-
-           // scrollEvent.fireScrollingEvent();
           }
 
           if ($scope.$parent.bindScrollVertical) {
