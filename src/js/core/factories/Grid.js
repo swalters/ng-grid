@@ -49,7 +49,22 @@ angular.module('ui.grid')
     self.headerHeight = self.options.headerRowHeight;
 
 
+    /**
+     * @ngdoc object
+     * @name footerHeight
+     * @propertyOf ui.grid.class:Grid
+     * @description returns the total footer height gridFooter + columnFooter
+     */
     self.footerHeight = self.calcFooterHeight();
+
+
+    /**
+     * @ngdoc object
+     * @name columnFooterHeight
+     * @propertyOf ui.grid.class:Grid
+     * @description returns the total column footer height
+     */
+    self.columnFooterHeight = self.calcColumnFooterHeight();
 
     self.rtl = false;
     self.gridHeight = 0;
@@ -355,6 +370,14 @@ angular.module('ui.grid')
      if (this.options.showGridFooter) {
        height += this.options.gridFooterHeight;
      }
+
+     height += this.calcColumnFooterHeight();
+
+     return height;
+   };
+
+   Grid.prototype.calcColumnFooterHeight = function () {
+     var height = 0;
 
      if (this.options.showColumnFooter) {
        height += this.options.columnFooterHeight;

@@ -261,14 +261,6 @@
           grid.cellNav.lastRowCol = null;
           grid.cellNav.focusedCells = [];
 
-          /**
-           * @ngdoc object
-           * @name scrollTo
-           * @propertyOf ui.grid.cellNav:Grid.cellNav
-           * @description enables features to enable or disable Focusing after a scroll
-           */
-          grid.cellNav.focusAfterScroll = true;
-
           service.defaultGridOptions(grid.options);
 
           /**
@@ -629,7 +621,7 @@
 
           // The bottom boundary is the current Y scroll position, plus the height of the grid, but minus the header height.
           //   Basically this is the viewport height added on to the scroll position
-          var bottomBound = grid.renderContainers.body.prevScrollTop + grid.gridHeight - grid.headerHeight;
+          var bottomBound = grid.renderContainers.body.prevScrollTop + grid.gridHeight - grid.renderContainers.body.headerHeight - grid.footerHeight -  grid.scrollbarWidth;
 
           // If there's a horizontal scrollbar, remove its height from the bottom boundary, otherwise we'll be letting it obscure rows
           //if (grid.horizontalScrollbarHeight) {
@@ -836,8 +828,20 @@
 
               uiGridCtrl.cellNav = {};
 
-              uiGridCtrl.cellNav.focusCell = function (row, col) {
-                uiGridCtrl.cellNav.broadcastCellNav({ row: row, col: col });
+              //uiGridCtrl.cellNav.focusActiveCell = function () {
+              //  var elms = $elm[0].getElementsByClassName('ui-grid-cell-focus');
+              //  if (elms.length > 0){
+              //    elms[0].focus();
+              //  }
+              //};
+
+              uiGridCtrl.cellNav.getActiveCell = function () {
+                var elms = $elm[0].getElementsByClassName('ui-grid-cell-focus');
+                if (elms.length > 0){
+                  return elms[0];
+                }
+
+                return undefined;
               };
 
               //  gridUtil.logDebug('uiGridEdit preLink');
@@ -980,10 +984,6 @@
 
               grid.api.core.on.scrollBegin($scope, function (args) {
 
-                if (!grid.cellNav.focusAfterScroll) {
-                  return;
-                }
-
                 // Skip if there's no currently-focused cell
                 var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
                 if (lastRowCol == null) {
@@ -1005,9 +1005,6 @@
 
               grid.api.core.on.scrollEnd($scope, function (args) {
 
-                //if (!grid.cellNav.focusAfterScroll) {
-                //  return;
-                //}
 
                 // Skip if there's no currently-focused cell
                 var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
@@ -1025,13 +1022,17 @@
                 // If the body element becomes active, re-focus on the render container so we can capture cellNav events again.
                 //   NOTE: this happens when we navigate LET from the left-most cell (RIGHT from the right-most) and have to re-render a new
                 //   set of cells. The cell element we are navigating to doesn't exist and focus gets lost. This will re-capture it, imperfectly...
-                if ($document.activeElement === $document.body) {
+            //    if ($document.activeElement === $document.body) {
+
+                  //focus is always on our renderContainer element
+                  //focused Element !== activeCell because trying to keep active cell focused causes lots of issues
                   $elm[0].focus();
-                }
+
+           //     }
 
 
                // $timeout(function () {
-                  lastRowCol.eventType = uiGridCellNavConstants.EVENT_TYPE.KEYDOWN;
+               //   lastRowCol.eventType = uiGridCellNavConstants.EVENT_TYPE.KEYDOWN;
                   uiGridCtrl.cellNav.broadcastCellNav(lastRowCol);
              //   });
 
@@ -1068,7 +1069,7 @@
             return;
           }
 
-          setTabEnabled();
+         // setTabEnabled();
 
           // When a cell is clicked, broadcast a cellNav event saying that this row+col combo is now focused
           $elm.find('div').on('click', function (evt) {
@@ -1099,7 +1100,7 @@
 
               // This cellNav event came from a keydown event so we can safely refocus
               if (rowCol.hasOwnProperty('eventType') && rowCol.eventType === uiGridCellNavConstants.EVENT_TYPE.KEYDOWN) {
-                $elm.find('div')[0].focus();
+             //   $elm.find('div')[0].focus();
               }
             }
             else if (!(uiGridCtrl.grid.options.modifierKeysToMultiSelectCells && modifierDown)) {

@@ -333,6 +333,71 @@
 
   /**
    *  @ngdoc directive
+   *  @name ui.grid.edit.directive:uiGridRenderContainer
+   *  @element div
+   *  @restrict A
+   *
+   *  @description Adds keydown listeners to renderContainer element so we can capture when to begin edits
+   *
+   */
+  module.directive('uiGridRenderContainer', ['$timeout', '$injector', 'gridUtil', 'uiGridEditConstants',
+    function ($timeout, $injector, gridUtil, uiGridEditConstants) {
+      return {
+        replace: true,
+        priority: -99998, //run before cellNav
+        require: ['^uiGrid', 'uiGridRenderContainer'],
+        scope: false,
+        compile: function () {
+          return {
+            post: function ($scope, $elm, $attrs, controllers) {
+              var uiGridCtrl = controllers[0],
+                renderContainerCtrl = controllers[1];
+
+              // Skip attaching if edit and cellNav is not enabled
+              if (!uiGridCtrl.grid.api.edit || !uiGridCtrl.grid.api.cellNav) { return; }
+
+              var uiGridCellNavService = $injector.get('uiGridCellNavService');
+
+              var containerId = renderContainerCtrl.containerId;
+
+              var grid = uiGridCtrl.grid;
+
+              $scope.$on(uiGridEditConstants.events.CANCEL_CELL_EDIT, function () {
+                $elm[0].focus();
+              });
+              $scope.$on(uiGridEditConstants.events.END_CELL_EDIT, function () {
+                $elm[0].focus();
+              });
+
+              // Bind to keydown events in the render container
+              $elm.on('keydown', function (evt) {
+                //check if keydown causes navigation
+                var direction = uiGridCellNavService.getDirection(evt);
+                if (direction !== null) {
+                  return;
+                }
+
+
+                var lastRowCol = uiGridCtrl.grid.api.cellNav.getFocusedCell();
+                if (lastRowCol === null) {
+                  return;
+                }
+
+                uiGridCellNavService.scrollToIfNecessary(uiGridCtrl.grid,lastRowCol.row, lastRowCol.col);
+
+
+                $scope.$broadcast('renderContainerKeyDow', evt, lastRowCol);
+                
+              });
+
+            }
+          };
+        }
+      };
+    }]);
+
+  /**
+   *  @ngdoc directive
    *  @name ui.grid.edit.directive:uiGridCell
    *  @element div
    *  @restrict A
@@ -403,20 +468,26 @@
             var html;
             var origCellValue;
             var inEdit = false;
-            var isFocusedBeforeEdit = false;
+           // var isFocusedBeforeEdit = false;
             var cellModel;
             var cancelTouchstartTimeout;
 
             var editCellScope;
 
-            registerBeginEditEvents();
+            $scope.$on('renderContainerKeyDow', function (a, evt, lastRowCol) {
+              if (lastRowCol.row === $scope.row &&
+                lastRowCol.col === $scope.col) {
+                beginEditKeyDown(evt);
+              }
+            });
 
             function registerBeginEditEvents() {
               $elm.on('dblclick', beginEdit);
-              $elm.on('keydown', beginEditKeyDown);
-              if ($scope.col.colDef.enableCellEditOnFocus) {
-                $elm.find('div').on('focus', beginEditFocus);
-              }
+
+              //$elm.on('keydown', beginEditKeyDown);
+              //if ($scope.col.colDef.enableCellEditOnFocus) {
+              //  $elm.find('div').on('focus', beginEditFocus);
+              //}
 
               // Add touchstart handling. If the users starts a touch and it doesn't end after X milliseconds, then start the edit
               $elm.on('touchstart', touchStart);
@@ -599,13 +670,12 @@
               }
 
               if (!shouldEdit($scope.col, $scope.row)) {
-                gridUtil.logDebug('returning because of should edit');
                 return;
               }
 
               // if the cell isn't fully visible, and cellNav is present, scroll it to be fully visible before we start
               if ( $scope.grid.api.cellNav ){
-                $scope.grid.cellNav.focusAfterScroll = false;
+                gridUtil.logDebug('scrolltoifnecessary from edit');
                 $scope.grid.api.cellNav.scrollToIfNecessary( $scope.row, $scope.col );
               }
 
@@ -653,7 +723,7 @@
                 editCellScope = $scope.$new();
                 $compile(cellElement)(editCellScope);
                 var gridCellContentsEl = angular.element($elm.children()[0]);
-                isFocusedBeforeEdit = gridCellContentsEl.hasClass('ui-grid-cell-focus');
+         //       isFocusedBeforeEdit = gridCellContentsEl.hasClass('ui-grid-cell-focus');
                 gridCellContentsEl.addClass('ui-grid-cell-contents-hidden');
               };
               if (!$rootScope.$$phase) {
@@ -693,10 +763,6 @@
             }
 
             function endEdit(retainFocus) {
-              if ( $scope.grid.api.cellNav ){
-                $scope.grid.cellNav.focusAfterScroll = true;
-              }
-
               if (!inEdit) {
                 return;
               }
@@ -705,10 +771,10 @@
               editCellScope.$destroy();
               angular.element($elm.children()[1]).remove();
               gridCellContentsEl.removeClass('ui-grid-cell-contents-hidden');
-              if (retainFocus && isFocusedBeforeEdit) {
-                gridCellContentsEl[0].focus();
-              }
-              isFocusedBeforeEdit = false;
+              //if (retainFocus && isFocusedBeforeEdit) {
+              //  gridCellContentsEl[0].focus();
+              //}
+              //isFocusedBeforeEdit = false;
               inEdit = false;
               registerBeginEditEvents();
               $scope.grid.api.core.notifyDataChange( uiGridConstants.dataChange.EDIT );
@@ -840,6 +906,7 @@
                   else if (uiGridCtrl && uiGridCtrl.hasOwnProperty('cellNav') && renderContainerCtrl) {
                     evt.uiGridTargetRenderContainerId = renderContainerCtrl.containerId;
                     uiGridCtrl.grid.edit.cellWasFocusedAfterEdit = true;
+                    gridUtil.logDebug('cellNav handleKeyDown from edit');
                     uiGridCtrl.cellNav.handleKeyDown(evt);
                   }
 
