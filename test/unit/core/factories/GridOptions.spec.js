@@ -135,7 +135,7 @@ describe('GridOptions factory', function () {
       });
     });
 
-    iit('false and values', function() {
+    it('false and values', function() {
       var testFunction = function() {};
       var options = {
         onRegisterApi: testFunction,

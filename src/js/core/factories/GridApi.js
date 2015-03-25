@@ -209,7 +209,8 @@
          * <br/>
          * .on.eventName(scope, callBackFn, _this)
          * <br/>
-         * scope - a scope reference to add a deregister call to the scopes .$on('destroy')
+         * scope - a scope reference to add a deregister call to the scopes .$on('destroy').  Scope is optional and can be a null value,
+         * but in this case you must deregister it yourself via the returned deregister function
          * <br/>
          * callBackFn - The function to call
          * <br/>
@@ -254,9 +255,12 @@
             };
 
             //destroy tracking when scope is destroyed
-            scope.$on('$destroy', function() {
-              removeListener();
-            });
+            if (scope) {
+              scope.$on('$destroy', function() {
+                removeListener();
+              });
+            }
+
 
             return removeListener;
           };

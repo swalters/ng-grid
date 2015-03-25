@@ -31,8 +31,6 @@
           // Register this viewport with its container 
           containerCtrl.viewport = $elm;
 
-         // var throttledScrollHandler = gridUtil.throttle(scrollHandler, 5, {trailing: true});
-
           $elm.on('scroll', scrollHandler);
 
           var ignoreScroll = false;
@@ -63,10 +61,6 @@
               scrollEvent.y = { percentage: vertScrollPercentage };
             }
 
-            if (grid.edit && grid.edit.cellWasFocusedAfterEdit) {
-              scrollEvent.withDelay = false;
-              grid.edit.cellWasFocusedAfterEdit = false;
-            }
             grid.scrollContainers($scope.$parent.containerId, scrollEvent);
           }
 
