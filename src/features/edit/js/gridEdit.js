@@ -470,7 +470,7 @@
                   beginEditKeyDown(evt);
                 }
 
-                uiGridCellNavService.scrollToIfNecessary(uiGridCtrl.grid, rowCol.row, rowCol.col);
+                uiGridCtrl.grid.api.core.scrollToIfNecessary(rowCol.row, rowCol.col);
               });
             }
 

@@ -218,7 +218,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
     // be, not that it is giving some specified result (i.e. I just updated them to what they were)
     it('should request scroll to row and column', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo(grid, grid.options.data[4], grid.columns[4].colDef);
+        grid.scrollTo(grid.options.data[4], grid.columns[4].colDef);
       });
       $timeout.flush();
 
@@ -229,7 +229,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to row only - first row', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid, grid.options.data[0], null);
+        grid.scrollTo( grid.options.data[0], null);
       });
       $timeout.flush();
       
@@ -238,7 +238,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to row only - last row', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid, grid.options.data[10], null);
+        grid.scrollTo( grid.options.data[10], null);
       });
       $timeout.flush();
       
@@ -248,7 +248,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to row only - row 4', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid, grid.options.data[5], null);
+        grid.scrollTo( grid.options.data[5], null);
       });
       $timeout.flush();
       
@@ -258,7 +258,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to column only - first column', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid, null, grid.columns[0].colDef);
+        grid.scrollTo( null, grid.columns[0].colDef);
       });
       $timeout.flush();
 
@@ -268,7 +268,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to column only - last column', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid, null, grid.columns[10].colDef);
+        grid.scrollTo( null, grid.columns[10].colDef);
       });
       $timeout.flush();
 
@@ -278,7 +278,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request scroll to column only - column 7', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid,  null, grid.columns[8].colDef);
+        grid.scrollTo(  null, grid.columns[8].colDef);
       });
       $timeout.flush();
       
@@ -287,7 +287,7 @@ describe('ui.grid.edit uiGridCellNavService', function () {
 
     it('should request no scroll as no row or column', function () {
       $timeout(function () {
-        uiGridCellNavService.scrollTo( grid,  null, null );
+        grid.scrollTo( null, null );
       });
       $timeout.flush();
       
